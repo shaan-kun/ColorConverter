@@ -1,7 +1,10 @@
+import sys
+
+
 def rgb_to_hex(red, green, blue):
-    red = int(red)
-    green = int(green)
-    blue = int(blue)
+    red = hex(red)
+    green = hex(green)
+    blue = hex(blue)
 
     return red, green, blue
 
@@ -141,3 +144,37 @@ def hsv_to_rgb(hue, saturation, value):
     blue = (blue + m) * 255
 
     return red, green, blue
+
+
+def rgb_to_color(color, values):
+    return {
+        'hex': rgb_to_hex,
+        'cmyk': rgb_to_cmyk,
+        'hsl': rgb_to_hsl,
+        'hsv': rgb_to_hsv,
+    }[color](*values)
+
+
+def color_convert(func, values):
+    values = func(*values)
+    return rgb_to_color(color_2, values)
+
+
+if __name__ == '__main__':
+    color_1 = sys.argv[1]
+    color_2 = sys.argv[-1]
+    values = sys.argv[2:-1]
+
+    result = None
+    if color_1 == 'rgb':
+        result = rgb_to_color(color_2, [int(num) for num in values])
+    elif color_1 == 'hex':
+        result = [int(num, 16) for num in values]
+    elif color_1 == 'cmyk':
+        result = color_convert(cmyk_to_rgb, [int(num) for num in values])
+    elif color_1 == 'hsl':
+        result = color_convert(hsl_to_rgb, [int(num) for num in values])
+    elif color_1 == 'hsv':
+        result = color_convert(hsv_to_rgb, [int(num) for num in values])
+
+    print(*result)
