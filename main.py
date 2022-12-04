@@ -13,6 +13,9 @@ def rgb_to_cmyk(red, green, blue):
 
     black = 1 - max(red, green, blue)
 
+    if black == 1:
+        return 0, 0, 0, 1
+
     cyan = (1 - red - black) / (1 - black)
     magenta = (1 - green - black) / (1 - black)
     yellow = (1 - blue - black) / (1 - black)
@@ -28,6 +31,12 @@ def rgb_to_hsl(red, green, blue):
     color_max = max(red, green, blue)
     color_min = min(red, green, blue)
     delta = color_max - color_min
+
+    if delta == 0:
+        if color_max == 0:
+            return 0, 0, 0
+        else:
+            return 0, 0, 1
 
     hue = 0
     if color_max == red:
