@@ -2,11 +2,7 @@ import sys
 
 
 def rgb_to_hex(red, green, blue):
-    red = hex(red)
-    green = hex(green)
-    blue = hex(blue)
-
-    return red, green, blue
+    return hex(red), hex(green), hex(blue)
 
 
 def rgb_to_cmyk(red, green, blue):
@@ -17,13 +13,13 @@ def rgb_to_cmyk(red, green, blue):
     black = 1 - max(red, green, blue)
 
     if black == 1:
-        return 0, 0, 0, 1
+        return 0, 0, 0, 100
 
     cyan = (1 - red - black) / (1 - black)
     magenta = (1 - green - black) / (1 - black)
     yellow = (1 - blue - black) / (1 - black)
 
-    return cyan, magenta, yellow, black
+    return round(cyan * 100), round(magenta * 100), round(yellow * 100), round(black * 100)
 
 
 def rgb_to_hsl(red, green, blue):
@@ -39,7 +35,7 @@ def rgb_to_hsl(red, green, blue):
         if color_max == 0:
             return 0, 0, 0
         else:
-            return 0, 0, 1
+            return 0, 0, 100
 
     hue = 0
     if color_max == red:
@@ -52,7 +48,7 @@ def rgb_to_hsl(red, green, blue):
     lightness = (color_max + color_min) / 2
     saturation = 0 if delta == 0 else delta / (1 - abs(2 * lightness - 1))
 
-    return hue, saturation, lightness
+    return round(hue), round(saturation * 100), round(lightness * 100)
 
 
 def rgb_to_hsv(red, green, blue):
@@ -63,6 +59,12 @@ def rgb_to_hsv(red, green, blue):
     color_max = max(red, green, blue)
     color_min = min(red, green, blue)
     delta = color_max - color_min
+
+    if delta == 0:
+        if color_max == 0:
+            return 0, 0, 0
+        else:
+            return 0, 0, 100
 
     hue = 0
     if color_max == red:
@@ -75,26 +77,34 @@ def rgb_to_hsv(red, green, blue):
     saturation = 0 if color_max == 0 else delta / color_max
     value = color_max
 
-    return hue, saturation, value
+    return round(hue), round(saturation * 100), round(value * 100)
 
 
-def hex_to_rgb(red, green, blue):
-    red = int(red, 16)
-    green = int(green, 16)
-    blue = int(blue, 16)
-
-    return red, green, blue
+# def hex_to_rgb(red, green, blue):
+#     red = int(red, 16)
+#     green = int(green, 16)
+#     blue = int(blue, 16)
+#
+#     return red, green, blue
 
 
 def cmyk_to_rgb(cyan, magenta, yellow, black):
+    cyan /= 100
+    magenta /= 100
+    yellow /= 100
+    black /= 100
+
     red = 255 * (1 - cyan) * (1 - black)
     green = 255 * (1 - magenta) * (1 - black)
     blue = 255 * (1 - yellow) * (1 - black)
 
-    return red, green, blue
+    return round(red), round(green), round(blue)
 
 
 def hsl_to_rgb(hue, saturation, lightness):
+    saturation /= 100
+    lightness /= 100
+
     color = (1 - abs(2 * lightness - 1)) * saturation
     x = color * (1 - abs((hue / 60) % 2 - 1))
     m = lightness - color / 2
@@ -117,10 +127,13 @@ def hsl_to_rgb(hue, saturation, lightness):
     green = (green + m) * 255
     blue = (blue + m) * 255
 
-    return red, green, blue
+    return round(red), round(green), round(blue)
 
 
 def hsv_to_rgb(hue, saturation, value):
+    saturation /= 100
+    value /= 100
+
     color = value * saturation
     x = color * (1 - abs((hue / 60) % 2 - 1))
     m = value - color
@@ -143,7 +156,7 @@ def hsv_to_rgb(hue, saturation, value):
     green = (green + m) * 255
     blue = (blue + m) * 255
 
-    return red, green, blue
+    return round(red), round(green), round(blue)
 
 
 def rgb_to_color(color, values):
@@ -169,7 +182,7 @@ if __name__ == '__main__':
     if color_1 == 'rgb':
         result = rgb_to_color(color_2, [int(num) for num in values])
     elif color_1 == 'hex':
-        result = [int(num, 16) for num in values]
+        result = rgb_to_color(color_2, [int(num, 16) for num in values])
     elif color_1 == 'cmyk':
         result = color_convert(cmyk_to_rgb, [int(num) for num in values])
     elif color_1 == 'hsl':
